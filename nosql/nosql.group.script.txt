@@ -1,0 +1,541 @@
+QUESTION 1
+
+HBASE #1: Using the first companies’ information you have actually stored in your mongo database, create and insert it in an HBase table. Use the following specifications:
+
+Use your email name for your namespace. Don't forget to create first the namespace.
+Use the first companies’ name as the name of the table.
+This table will only have 1 column family named ‘Stock’.
+The column family ‘Stock’ will have to store until 7 versions for its data.
+The column family ‘Stock’ will have the mongo Time value as its timestamp. Remember, HBase timestamp only allows numbers with no separation characters.
+You will have to load all data for the first 2 days, beginning with the INITIAL column date and only for the opening stocks’ price.
+Once you've got the table loaded, issue the following command and include its output:
+
+scan '<namespace>:<table_name>'
+
+create_namespace 'albertoderoni'
+
+create 'albertoderoni:apple', {NAME=>'STOCK', VERSIONS=>7}
+
+put 'albertoderoni:apple',20190913,'STOCK:open',219.0479,153000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',218.7050,143000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',217.5143,133000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',217.8905,123000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',218.8100,113000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',219.3803,103000
+
+put 'albertoderoni:apple',20190913,'STOCK:open',219.6292,93000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',219.6700,153000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',219.8200,143000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',219.443,133000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',219.3179,123000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',219.9082,113000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',218.4043,103000
+
+put 'albertoderoni:apple',20190916,'STOCK:open',218.4500,93000
+
+scan 'albertoderoni:apple'
+
+ROW                                            COLUMN+CELL                                                                                                                        20190913                                    column=STOCK:Open, timestamp=153000, value=219.0479
+
+20190916                                    column=STOCK:open, timestamp=153000, value=219.67
+
+2 row(s)
+
+Took 0.0147 seconds
+
+
+
+QUESTION 2
+
+HBASE #2: Add the new column ‘volume’, for column family ‘Stock’. Insert its values for exactly the same dates you have for column ‘open’. Don’t forget to use the mongo Time value as its timestamp.
+
+Once you’ve got the table loaded, issue the following command and include its output:
+
+scan '<namespace>:<table_name>'
+
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',3485513,153000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',3732736,143000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',6572185,133000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',3604541,123000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',4166242,113000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',4589991,103000
+
+put 'albertoderoni:apple',20190913,'STOCK:volume',11032845,93000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',1568208,153000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',1820127,143000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',2250373,133000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',1497013,123000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',2615614,113000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',3359289,103000
+
+put 'albertoderoni:apple',20190916,'STOCK:volume',6211563,93000
+
+scan 'albertoderoni:apple'
+
+ROW                           COLUMN+CELL
+
+20190913                   column=STOCK:open, timestamp=153000, value=219.0479
+
+20190913                  column=STOCK:volume, timestamp=153000, value=3485513
+
+20190916                   column=STOCK:open, timestamp=153000, value=219.67
+
+20190916                   column=STOCK:volume, timestamp=153000, value=1568208
+
+2 row(s)
+
+Took 0.0142 seconds
+
+QUESTION 3
+
+HBASE #3: Show the first / earliest opening price for each day. The one at 9:30 in the morning.
+
+Please include the HBase statement and its output.
+
+
+get 'albertoderoni:apple',20190913,{COLUMN=>'STOCK:open',TIMERANGE=>[93000,93001]}
+
+COLUMN                         CELL
+
+STOCK:open                    timestamp=93000, value=219.6292
+
+1 row(s)
+
+Took 0.0886 seconds
+
+QUESTION 4
+
+HBASE #4: Show the last / latest open price for each day, that is, the price at 3:30 PM.
+
+Please include the HBase statement and its output.
+
+get 'albertoderoni:apple',20190913,{COLUMN=>'STOCK:open',TIMERANGE=>[153000,153001]}
+
+COLUMN                         CELL
+
+ STOCK:open                  timestamp=153000, value=219.0479
+
+1 row(s)
+
+Took 0.0250 seconds
+
+
+QUESTION 5
+
+HBASE #5: Reduce the number of versions to 4. Once you have done it, show the volume of stock exchanged just for the first day of your data. You must show all the cells for that day.
+
+alter 'albertoderoni:apple', {NAME=>'STOCK', VERSIONS=>4}
+
+Updating all regions with the new schema...1/1 regions updated.
+
+Done.
+
+Took 2.2855 seconds
+
+get 'albertoderoni:apple',20190916,{COLUMN=>'STOCK:volume',VERSIONS=>4,TIMERANGE=>[0,153001]}
+
+COLUMN                                             CELL                                                                                                                                            STOCK:volume                                  timestamp=153000, value=1568208                                                                                        STOCK:volume                                  timestamp=143000, value=1820127                                                                                        STOCK:volume                                  timestamp=133000, value=2250373                                                                                        STOCK:volume                                  timestamp=123000, value=1497013                                                                                           1 row(s)
+Took 0.0262 seconds
+
+
+QUESTION 6
+
+MONGO #1: Load your first companies’ JSON documents into your default database and the stock collection. Each group should only load the companies’ files specified under the column FIRST. You can use the insert method, bulk insert, insertMany method, mongoimport command, or whichever you consider is the most appropriate with your mongo installation. This really doesn’t matter. The aim is to have your first companies’ data loaded in the stock collection.
+
+Once you’ve got all documents in the collection, please do the following transformation in the collection:
+
+Insert the companies’ stock name into a new field named Company. Show the mongo statement and its output.
+Update the name of the embedded fields in the Stock document. You should remove the number and the space that follows the number from all the embedded fields. For example, field “1 open” should be converted to “open”. The same should be done for the rest of fields in the embedded stock document. As usual, show the mongo statement and its output.
+
+1)
+
+db.stocks.update({},{$set:{Company:"Apple"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+
+2)  :
+
+
+> db.stocks.update({},{$rename:{"Stock.1 open":"Stock.open"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+> db.stocks.update({},{$rename:{"Stock.2 high":"Stock.high"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+> db.stocks.update({},{$rename:{"Stock.3 low":"Stock.low"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+> db.stocks.update({},{$rename:{"Stock.4 close":"Stock.close"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+> db.stocks.update({},{$rename:{"Stock.5 volume":"Stock.volume"}},{multi:true})
+WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+
+so now the collection looks like:
+
+ db.stocks.findOne()
+{
+        "_id" : ObjectId("5f899d117977797cd12ab436"),
+        "Date" : "2019-10-01",
+        "Time" : "11:30:00",
+        "Stock" : {
+                "open" : 227.65,
+                "high" : 227.65,
+                "low" : 225.435,
+                "close" : 225.62,
+                "volume" : 2780316
+        },
+        "Company" : "Apple"
+
+
+
+       QUESTION 7
+
+        MONGO #2: Next, load your second companies’ JSON documents into the same database and collection as before. Once you’re done with the load or insert, do exactly the same transformations you did for your first company. Be careful with the companies’ names. Each company has to identify its own data. So you can’t change your first companies’ content.
+
+        On both cases, please show the mongo statements you used to accomplish those transformations. Include also the output of both statements.
+
+        db.stocks.update({Company:{$ne:"Apple"}},{$set:{Company:"IBM"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+
+        db.stocks.update({Company:{$eq:"IBM"}},{$rename:{"Stock.1 open":"Stock.open"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+        > db.stocks.update({Company:{$eq:"IBM"}},{$rename:{"Stock.2 high":"Stock.high"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+        > db.stocks.update({Company:{$eq:"IBM"}},{$rename:{"Stock.3 low":"Stock.low"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+        > db.stocks.update({Company:{$eq:"IBM"}},{$rename:{"Stock.4 close":"Stock.close"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+        > db.stocks.update({Company:{$eq:"IBM"}},{$rename:{"Stock.5 volume":"Stock.volume"}},{multi:true})
+        WriteResult({ "nMatched" : 100, "nUpserted" : 0, "nModified" : 100 })
+
+
+        so now:
+
+        db.stocks.count({Company:"Apple"})
+        100
+        > db.stocks.count({Company:"IBM"})
+        100
+
+
+        QUESTION 8
+
+MONGO #3: Add a new Boolean field named “raise” in all embedded stock documents. If the stocks’ closing price is higher or equal than its open price, we’ll store a true value in the raise field. Else, if the closing price is smaller than the open price, we’ll store a false value. Show the mongo statement you used, and its output, of course.
+
+db.stocks.update({},{$set:{"Stock.raise":false}},{multi:true})
+WriteResult({ "nMatched" : 200, "nUpserted" : 0, "nModified" : 200 })
+
+
+db.stocks.update({$where:"this.Stock.open < this.Stock.close"},{$set:{"Stock.raise":true}},{multi:true})
+WriteResult({ "nMatched" : 98, "nUpserted" : 0, "nModified" : 98 })
+
+so now when a stock closed with a higher value that at market open:
+
+db.stocks.findOne({"Stock.raise":true})
+{
+        "_id" : ObjectId("5f89af79eeed42d6ba8ddbbb"),
+        "Date" : "2019-10-01",
+        "Time" : "10:30:00",
+        "Stock" : {
+                "open" : 226.7491,
+                "high" : 227.8581,
+                "low" : 226.2265,
+                "close" : 227.6491,
+                "volume" : 4840940,
+                "raise" : true
+        },
+        "Company" : "Apple"
+
+        QUESTION 9
+
+        MONGO #4: As you may notice, each group has an interval of stock exchange dates they are interested on. You should remove all documents that are not inside the interval. Please show the mongo statement and the output you obtained with those statements.
+
+        Once you’re done with the removal, please show us the documents that correspond to dates 2019-09-18 and 2019-09-19. Filter so that the time of each document should be between 10 AM and 12 PM. Your selection should specify all these filtering conditions in the mongo statement. We are only interested to see the date, time, raise and company fields, so these are the only fields you’re going to include in your statement. The output has to be ordered first by the date and time and then by the companies’ name. By the way, it must be a unique statement that covers all filtering, display and order conditions. Include the statement and its output, as usual.
+
+        > db.stocks.deleteMany({$and:[{Date:{$ne:"2019-09-13"}},{Date:{$ne:"2019-09-14"}},{Date:{$ne:"2019-09-15"}},{Date:{$ne:"2019-09-16"}},{Date:{$ne:"2019-09-17"}},{Date:{$ne:"2019-09-18"}},{Date:{$ne:"2019-09-19"}},{Date:{$ne:"2019-09-20"}},{Date:{$ne:"2019-09-21"}},{Date:{$ne:"2019-09-22"}},{Date:{$ne:"2019-09-23"}}]})
+        { "acknowledged" : true, "deletedCount" : 102 }
+
+        ------
+
+
+
+        > db.stocks.find({$and:[{$or:[{Date:{$eq:"2019-09-18"}},{Date:{$eq:"2019-09-19"}}]},{$or:[{Time:/^10/},{Time:/^11/},{Time:/^12/}]}]},{_id:0,Date:1,Time:1,"Stock.raise":1,Company:1}).pretty()
+
+
+
+        LOOK AT THIS CARLOS I AM SO PROUD OF MYSELF I SPENT 3 HOURS ON THIS BAD BOY
+
+
+
+        output of the above command:
+
+        {
+                "Date" : "2019-09-19",
+                "Time" : "12:30:00",
+                "Stock" : {
+                        "raise" : true
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-19",
+                "Time" : "11:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-19",
+                "Time" : "10:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "12:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "11:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "10:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "Apple"
+        }
+        {
+                "Date" : "2019-09-19",
+                "Time" : "12:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "IBM"
+        }
+        {
+                "Date" : "2019-09-19",
+                "Time" : "11:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "IBM"
+        }
+        {
+                "Date" : "2019-09-19",
+                "Time" : "10:30:00",
+                "Stock" : {
+                        "raise" : true
+                },
+                "Company" : "IBM"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "12:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "IBM"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "11:30:00",
+                "Stock" : {
+                        "raise" : false
+                },
+                "Company" : "IBM"
+        }
+        {
+                "Date" : "2019-09-18",
+                "Time" : "10:30:00",
+                "Stock" : {
+                        "raise" : true
+                },
+                "Company" : "IBM"
+        }
+
+
+        QUESTION 10
+
+        MONGO #5: Let’s do some grouping jobs. We need to obtain a report with the following requisites:
+
+        Report should be grouped by company and date.
+        For each company and date, we need the following information:
+        The identification key field of the group should be the companies’ name and date field.
+        The total amount of stock volume exchanged.
+        The stocks’ high-water mark, that is, the highest stock price it had ever reached. Also, the lowest stock prices it had ever been.
+        The number of documents per company and date group.
+        You must use just one mongo statement to obtain the grouping documents. Show this statement and the resulting groups’ output.
+
+
+        db.stocks.aggregate([{$group:{_id:{Company:"$Company",Date:"$Date"},Total_Trading_volume:{$sum:"$Stock.volume"},High_Water_Mark:{$max:"$Stock.high"},Low_Water_Mark:{$min:"$Stock.low"},JSON_count:{$sum:1}}}]).pretty()
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-19"
+                },
+                "Total_Trading_volume" : 20230502,
+                "High_Water_Mark" : 223.76,
+                "Low_Water_Mark" : 220.5811,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-23"
+                },
+                "Total_Trading_volume" : 1452762,
+                "High_Water_Mark" : 142.2931,
+                "Low_Water_Mark" : 140.6927,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-23"
+                },
+                "Total_Trading_volume" : 16890980,
+                "High_Water_Mark" : 219.84,
+                "Low_Water_Mark" : 217.8585,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-17"
+                },
+                "Total_Trading_volume" : 1977556,
+                "High_Water_Mark" : 142.48,
+                "Low_Water_Mark" : 140.74,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-18"
+                },
+                "Total_Trading_volume" : 23013119,
+                "High_Water_Mark" : 222.85,
+                "Low_Water_Mark" : 219.6511,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-20"
+                },
+                "Total_Trading_volume" : 32199270,
+                "High_Water_Mark" : 222.56,
+                "Low_Water_Mark" : 217.61,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-20"
+                },
+                "Total_Trading_volume" : 3690671,
+                "High_Water_Mark" : 143.9546,
+                "Low_Water_Mark" : 141.82,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-16"
+                },
+                "Total_Trading_volume" : 19322187,
+                "High_Water_Mark" : 220.3363,
+                "Low_Water_Mark" : 217.75,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-16"
+                },
+                "Total_Trading_volume" : 1480056,
+                "High_Water_Mark" : 143.77,
+                "Low_Water_Mark" : 142.34,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-13"
+                },
+                "Total_Trading_volume" : 37184053,
+                "High_Water_Mark" : 220.9423,
+                "Low_Water_Mark" : 217.1908,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-13"
+                },
+                "Total_Trading_volume" : 1640132,
+                "High_Water_Mark" : 144.7892,
+                "Low_Water_Mark" : 143.35,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-19"
+                },
+                "Total_Trading_volume" : 2768101,
+                "High_Water_Mark" : 145.03,
+                "Low_Water_Mark" : 142.8037,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "Apple",
+                        "Date" : "2019-09-17"
+                },
+                "Total_Trading_volume" : 16095646,
+                "High_Water_Mark" : 220.82,
+                "Low_Water_Mark" : 219.4224,
+                "JSON_count" : 7
+        }
+        {
+                "_id" : {
+                        "Company" : "IBM",
+                        "Date" : "2019-09-18"
+                },
+                "Total_Trading_volume" : 1729001,
+                "High_Water_Mark" : 142.3,
+                "Low_Water_Mark" : 140.6446,
+                "JSON_count" : 7
+        }
