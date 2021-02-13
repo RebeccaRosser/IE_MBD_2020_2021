@@ -23,3 +23,4 @@
 * SQL Data Modelling
 * Stream Processing & Real-Time Analytics
 * The Knowledge Discovery Process
+* Watson Challenge
