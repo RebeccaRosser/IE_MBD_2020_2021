@@ -1,5 +1,6 @@
 GOAL:
-*Predict the total number of Washington D.C. bicycle users on an hourly basis.*
+
+**Predict the total number of Washington D.C. bicycle users on an hourly basis.**
 
 Task description:
 
